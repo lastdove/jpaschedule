@@ -3,6 +3,7 @@ package com.sparta.scheduleappjpa.service;
 import com.sparta.scheduleappjpa.dto.CommentDTO;
 import com.sparta.scheduleappjpa.entity.Comment;
 import com.sparta.scheduleappjpa.entity.Schedule;
+import com.sparta.scheduleappjpa.exception.ResourceNotFoundException;
 import com.sparta.scheduleappjpa.repository.CommentRepository;
 import com.sparta.scheduleappjpa.repository.ScheduleRepository;
 import jakarta.transaction.Transactional;
@@ -40,5 +41,14 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long id) {
         commentRepository.deleteById(id);
+    }
+
+    @Transactional
+    public CommentDTO updateComment(Long id, CommentDTO commentDTO) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 댓글이 존재하지 않습니다."));
+        comment.setContent(commentDTO.getContent());
+        commentRepository.save(comment);
+        return new CommentDTO(comment);
     }
 }

@@ -16,7 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User createUser(UserDTO userDTO) {
+    public UserDTO createUser(UserDTO userDTO) {
         if(userRepository.existsByUsername(userDTO.getUsername())) {
             throw new RuntimeException("유저명이 이미 존재합니다.");
         } else {
@@ -24,16 +24,36 @@ public class UserService {
             user.setUsername(userDTO.getUsername());
             user.setEmail(userDTO.getEmail());
             user.setPassword(userDTO.getPassword()); // 비밀번호 암호화
-            return userRepository.save(user);
+            userRepository.save(user);
+            return new UserDTO(user);
         }
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public Optional<UserDTO> getUserById(Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            return Optional.of(new UserDTO(optionalUser.get()));
+        } else {
+            throw new RuntimeException("해당 id가 없습니다.");
+        }
     }
 
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateUser(Long id, UserDTO userDTO) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
+            user.setPassword(userDTO.getPassword());
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("유저 id가 존재하지 않습니다.");
+        }
     }
 }

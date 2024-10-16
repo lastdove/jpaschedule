@@ -1,6 +1,8 @@
 package com.sparta.scheduleappjpa.controller;
 
+import com.sparta.scheduleappjpa.dto.ScheduleDTO;
 import com.sparta.scheduleappjpa.dto.UserDTO;
+import com.sparta.scheduleappjpa.entity.Schedule;
 import com.sparta.scheduleappjpa.entity.User;
 import com.sparta.scheduleappjpa.service.UserService;
 import com.sparta.scheduleappjpa.repository.UserRepository;
@@ -23,7 +25,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
-        User user = userService.createUser(userDTO);
+        UserDTO user = userService.createUser(userDTO);
         UserDTO responseDTO = new UserDTO(); // DTO 객체 생성
         responseDTO.setUsername(user.getUsername());
         responseDTO.setEmail(user.getEmail());
@@ -32,15 +34,21 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        Optional<User> user = userService.getUserById(id);
-        return user.map(u -> ResponseEntity.ok(new UserDTO(u)))
+        Optional<UserDTO> user = userService.getUserById(id);
+        return user.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("삭제되었습니다.");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        userService.updateUser(id, userDTO);
+        return ResponseEntity.ok("수정이 완료되었습니다.");
     }
 
     @GetMapping

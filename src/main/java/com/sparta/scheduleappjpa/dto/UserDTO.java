@@ -36,7 +36,6 @@ public class UserDTO {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
-        this.password = user.getPassword();
         this.schedules = user.getSchedules().stream()
                 .map(ScheduleDTO::new)
                 .collect(Collectors.toList());

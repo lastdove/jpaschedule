@@ -20,8 +20,8 @@ public class ScheduleController {
 
     @PostMapping("/{userId}")
     public ResponseEntity<ScheduleDTO> createSchedule(@PathVariable Long userId, @Valid @RequestBody ScheduleDTO scheduleDTO) {
-        Schedule schedule = scheduleService.createSchedule(scheduleDTO, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ScheduleDTO(schedule));
+        ScheduleDTO schedule = scheduleService.createSchedule(scheduleDTO, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(schedule);
     }
 
     @GetMapping
@@ -40,8 +40,15 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
+    public ResponseEntity<String> deleteSchedule(@PathVariable Long id) {
         scheduleService.deleteSchedule(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("삭제되었습니다.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ScheduleDTO> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleDTO scheduleDTO) {
+        ScheduleDTO updatedSchedule = scheduleService.updateSchedule(id, scheduleDTO);
+        return ResponseEntity.ok(updatedSchedule);
+    }
+
 }
