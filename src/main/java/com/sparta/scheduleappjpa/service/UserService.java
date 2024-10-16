@@ -17,11 +17,15 @@ public class UserService {
 
     @Transactional
     public User createUser(UserDTO userDTO) {
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword()); // 비밀번호 암호화
-        return userRepository.save(user);
+        if(userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new RuntimeException("유저명이 이미 존재합니다.");
+        } else {
+            User user = new User();
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
+            user.setPassword(userDTO.getPassword()); // 비밀번호 암호화
+            return userRepository.save(user);
+        }
     }
 
     public Optional<User> getUserById(Long id) {
