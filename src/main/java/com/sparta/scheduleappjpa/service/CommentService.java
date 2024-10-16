@@ -9,7 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,16 +20,21 @@ public class CommentService {
     private final ScheduleRepository scheduleRepository;
 
     @Transactional
-    public Comment createComment(CommentDTO commentDTO, Long scheduleId) {
+    public CommentDTO createComment(CommentDTO commentDTO, Long scheduleId) {
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new RuntimeException("Schedule not found"));
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("Schedule not found"));
         comment.setSchedule(schedule);
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
+        return new CommentDTO(comment); // CommentDTO로 반환
     }
 
-    public Optional<Comment> getCommentById(Long id) {
-        return commentRepository.findById(id);
+    public List<CommentDTO> getCommentsByScheduleId(Long scheduleId) {
+        List<Comment> comments = commentRepository.findAllByScheduleId(scheduleId);
+        return comments.stream()
+                .map(CommentDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
